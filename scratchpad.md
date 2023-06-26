@@ -1,0 +1,14 @@
+- tf gacha
+	- roll a dice to get a random transformation
+- slow mannequin
+	- required to type a specific way, incorrect typing leads to an "error"
+	- displays message on errors
+	- "Whoops! I didn't hear you praise Rosa. No talking for you, drone.~"
+	- "If you can't use your words properly to praise Rosa, how about you use your body instead?~"
+	- deleted messages are logged to a channel
+- whenever a rosa forgets to smile, their message is replaced with squeaks
+- paw filter
+	- "**HUFFF!!**"
+	- "**Can't stop huffing!~ *HUUUUFFF*~**"
+- on too many failures, must say "Miss Rosa"
+- on too many failures, added to a list. When rosa runs a command, all the users on that list send a subby message

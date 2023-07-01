@@ -16,6 +16,9 @@ import cogs.smile_enforcer
 import cogs.renamer
 import cogs.speak_as_bot
 import cogs.squeak_miho
+import cogs.leashing
+import cogs.woof_enforcer
+#import cogs.webhook_manager
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -33,4 +36,7 @@ async def on_ready():
 	await bot.add_cog(cogs.renamer.Renamer_Cog(bot))
 	await bot.add_cog(cogs.speak_as_bot.Speak_as_Bot_Cog(bot))
 	await bot.add_cog(cogs.squeak_miho.Squeak_Miho_Cog(bot))
-
+	await bot.add_cog(cogs.leashing.Leashing_Cog(bot))
+	await bot.add_cog(cogs.woof_enforcer.WoofEnforcer_Cog(bot))
+	# Webhook comes last
+#	await bot.add_cog(cogs.webhook_manager.Webhook_Manager_Cog(bot))

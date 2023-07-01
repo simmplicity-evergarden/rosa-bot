@@ -12,3 +12,10 @@
 	- "**Can't stop huffing!~ *HUUUUFFF*~**"
 - on too many failures, must say "Miss Rosa"
 - on too many failures, added to a list. When rosa runs a command, all the users on that list send a subby message
+- randomly replace individual words with squeaks
+- bot filter
+	- increases strength over time
+	- goes from normal to leet-speak to hex
+	- corruption increases with each message
+	- random robot noises: "beep" "boop" etc
+	- first person pronouns replaced w/ 

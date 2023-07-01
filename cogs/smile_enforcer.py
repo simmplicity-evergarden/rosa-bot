@@ -9,6 +9,7 @@ from string import ascii_uppercase
 from random import choices
 from random import randint
 from typing import Literal
+from settings import *
 #from typing import Optional
 import configparser
 
@@ -19,27 +20,28 @@ class Smile_Enforcer_Cog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		# Load config
-		self.config = configparser.ConfigParser()
-		self.config.read(os.path.dirname(__file__)+os.path.sep+'..'+os.path.sep+'config.ini')
 		logger.info('Loaded Smile Enforcer')
 
 	async def cog_load(self):
-		target_guild = self.bot.get_guild(self.config.getint('guild','guild_id'))
+		target_guild = self.bot.get_guild(config.getint('guild','guild_id'))
 		for webhook in await target_guild.webhooks():
 			if webhook.name == 'rosa_bot':
 				self.webhook = webhook
 				# Track this separately since it seems to get lost
-				self.webhook_channel_id = webhook.channel_id
+				config['runtime']['webhook_channel'] = str(webhook.channel_id)
 
 	# Run message relay
 	@commands.Cog.listener()
 	async def on_message(self, message):
 
-		# Toy role check
-		toy_role = message.guild.get_role(self.config.getint('roles','toy_role'))
-		if toy_role not in message.author.roles:
+		# Webhook check
+		if isinstance(message.author, discord.User):
 			return
 
+		# Toy role check
+		toy_role = message.guild.get_role(config.getint('roles','toy_role'))
+		if toy_role not in message.author.roles:
+			return
 
 		message_content = message.content
 		print(message_content)
@@ -58,9 +60,9 @@ class Smile_Enforcer_Cog(commands.Cog):
 			await message.delete()
 
 			# Squeak modififer
-			if self.webhook_channel_id != message.channel.id:
+			if config.getint('runtime','webhook_channel') != message.channel.id:
 				await self.webhook.edit(channel=message.channel)
-				self.webhook_channel_id = message.channel.id
+				config['runtime']['webhook_channel'] = str(message.channel.id)
 
 			wm_contents = self.squeak_modifier(message.content)
 			wm_author = message.author.display_name
@@ -72,9 +74,13 @@ class Smile_Enforcer_Cog(commands.Cog):
 	@commands.Cog.listener()
 	async def on_message_edit(self, message_old, message):
 
+		# Webhook check
+		if isinstance(message.author, discord.User):
+			return
+
 		# Toy role check
-		mod_role = message.guild.get_role(self.config.getint('roles','toy_role'))
-		if mod_role not in message.author.roles:
+		toy_role = message.guild.get_role(config.getint('roles','toy_role'))
+		if toy_role not in message.author.roles:
 			return
 
 
@@ -92,7 +98,7 @@ class Smile_Enforcer_Cog(commands.Cog):
 
 	# Modify messages
 	def squeak_modifier(self, message_content: str):
-		new_message = re.sub(r'[A-Za-z0-9\']+',self.squeak_length,message_content)
+		new_message = re.sub(r"(?<![<:@])\b[\w']*\w*",self.squeak_length,message_content)
 		return new_message
 
 	def squeak_length(self, word):

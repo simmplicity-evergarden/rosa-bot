@@ -9,6 +9,7 @@ from string import ascii_uppercase
 from random import choices
 from random import randint
 from typing import Literal
+from settings import *
 #from typing import Optional
 import configparser
 
@@ -19,23 +20,40 @@ class Squeak_Miho_Cog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		# Load config
-		self.config = configparser.ConfigParser()
-		self.config.read(os.path.dirname(__file__)+os.path.sep+'..'+os.path.sep+'config.ini')
 		logger.info('Loaded Squeak Miho')
 
 	async def cog_load(self):
-		target_guild = self.bot.get_guild(self.config.getint('guild','guild_id'))
+		target_guild = self.bot.get_guild(config.getint('guild','guild_id'))
 		for webhook in await target_guild.webhooks():
 			if webhook.name == 'rosa_bot':
 				self.webhook = webhook
 				# Track this separately since it seems to get lost
-				self.webhook_channel_id = webhook.channel_id
+				config['runtime']['webhook_channel'] = str(webhook.channel_id)
+
+	# change miho's squeak chance
+	@commands.hybrid_command()
+	async def miho_squeak_chance(self, context: commands.Context, chance: int):
+		if context.author.id not in [153857426813222912,1053028780383424563]:
+			return
+
+		config['chances']['miho_squeak_chance'] = str(chance)
+		save_settings()
+		logger.info(f'Changed Miho\'s squeak chance to {chance}')
+		await context.send(f'Changed Miho\'s squeak chance to {chance}', ephemeral=True)
+
+
 
 	# Run message relay
 	@commands.Cog.listener()
 	async def on_message(self, message):
+		if not config.getboolean('toggles','miho_squeaks'):
+			return
 
-		# Toy role check
+		# webhook check
+		if type(message.author) == discord.User:
+			return
+
+		# Miho ID check
 		if message.author.id != 232281893696045056:
 			return
 
@@ -47,18 +65,18 @@ class Squeak_Miho_Cog(commands.Cog):
 			if sticker.name == 'Rosaflatable':
 				return
 
-		dice_roll = randint(0,9)
+		dice_roll = randint(0,99)
 		print(dice_roll)
 
 		# ~10% chance to activate
-		if dice_roll == 4:
+		if dice_roll < config.getint('chances','miho_squeak_chance'):
 			# Replace message
 			await message.delete()
 
 			# Squeak modififer
-			if self.webhook_channel_id != message.channel.id:
+			if config.getint('runtime','webhook_channel') != message.channel.id:
 				await self.webhook.edit(channel=message.channel)
-				self.webhook_channel_id = message.channel.id
+				config['runtime']['webhook_channel'] = str(message.channel.id)
 
 			wm_contents = self.squeak_modifier(message.content)
 			wm_author = message.author.display_name
@@ -68,7 +86,7 @@ class Squeak_Miho_Cog(commands.Cog):
 
 	# Modify messages
 	def squeak_modifier(self, message_content: str):
-		new_message = re.sub(r'[A-Za-z0-9\']+',self.squeak_length,message_content)
+		new_message = re.sub(r"(?<![<:@])\b[\w']*\w*",self.squeak_length,message_content)
 		return new_message
 
 	def squeak_length(self, word):
@@ -96,3 +114,16 @@ class Squeak_Miho_Cog(commands.Cog):
 					return '**Smile!**'
 				case 7:
 					return 'Rosa'
+
+	# Miho safeword
+	@commands.Cog.listener()
+	async def on_reaction_add(self, reaction, member):
+		if isinstance(reaction.emoji, str):
+			return 
+		# Miho ID check
+		if member.id != 232281893696045056:
+			return
+
+		if reaction.emoji.name == 'safeword':
+			config['toggles']['miho_squeaks'] = 'False'
+			save_settings()

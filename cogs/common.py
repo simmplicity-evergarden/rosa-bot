@@ -4,6 +4,7 @@ import re
 import os
 import discord
 import logging
+from settings import *
 
 logger = logging.getLogger('bot')
 

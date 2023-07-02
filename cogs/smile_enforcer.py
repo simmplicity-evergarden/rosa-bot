@@ -44,7 +44,7 @@ class Smile_Enforcer_Cog(commands.Cog):
 			return
 
 		message_content = message.content
-		print(message_content)
+		logger.debug('{message.author.display_name}: {message_content}')
 
 		# Allow Rosa sticker
 		for sticker in message.stickers:

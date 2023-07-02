@@ -47,7 +47,7 @@ class Squeak_Miho_Cog(commands.Cog):
 			return
 
 		message_content = message.content
-		print(message_content)
+		logger.debug(f'{message.author.display_name}: {message_content}')
 
 		# Allow Rosa sticker
 		for sticker in message.stickers:
@@ -55,7 +55,7 @@ class Squeak_Miho_Cog(commands.Cog):
 				return
 
 		dice_roll = randint(0,99)
-		print(dice_roll)
+		#logger.debug(dice_roll)
 
 		# ~10% chance to activate
 		if dice_roll < config.getint('numbers','miho_squeak_chance'):

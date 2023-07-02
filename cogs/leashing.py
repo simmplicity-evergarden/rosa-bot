@@ -19,8 +19,10 @@ logger = logging.getLogger('bot')
 leash_pickle_file = os.path.dirname(__file__)+os.path.sep+'leashing.pickle'
 
 class Leashing_Cog(commands.Cog):
-
+	# Maps leasher to list of leashees
 	leash_mapping = {}
+	# Maps leasher to lsat channel spoken in
+	channel_mapping = {}
 
 	def __init__(self, bot):
 		self.bot = bot
@@ -33,12 +35,17 @@ class Leashing_Cog(commands.Cog):
 	@commands.hybrid_command(description='Add or remove leashing (toggle).')
 	async def leash(self, context: commands.Context, target_member: discord.Member):
 
+		# Prevent leashing the bot
+		if target_member.id == self.bot.user.id:
+			await context.send('*limit-breaks so hard it crashes your game*')
+			return
+
+
 		# Permissions check
 		#if context.author.id not in [1053028780383424563]:
 		#	return
 		if config.getint('roles','meanie_role') not in [role.id for role in context.author.roles]:
 			return
-
 
 		logger.info(f'{context.author.name} attempts to leash {target_member.name}')
 
@@ -64,6 +71,8 @@ class Leashing_Cog(commands.Cog):
 		# Permission overwrite that deny viewing a channel
 		no_perms = discord.PermissionOverwrite()
 		no_perms.view_channel = False
+
+		self.channel_mapping[context.author.id] = context.channel.id
 
 		for channel in context.guild.channels:
 			# Ignore important channels
@@ -95,6 +104,22 @@ class Leashing_Cog(commands.Cog):
 		# Check for leasher's ID
 		if message.author.id not in self.leash_mapping.keys():
 			return
+
+		# Limit API calls
+		# Check for non-existent key
+		if message.author.id not in self.channel_mapping.keys():
+			self.channel_mapping[message.author.id] = message.channel.id
+		# Check for mismatched channel
+		elif message.channel.id != self.channel_mapping[message.author.id]:
+			self.channel_mapping[message.author.id] = message.channel.id
+		# Avoid updating perms if channel matches last channel
+		else:
+			return
+
+
+		# DEBUG
+		print('Updating channel perms')
+
 
 		# Permission overwrite that deny viewing a channel
 		no_perms = discord.PermissionOverwrite()
@@ -135,6 +160,11 @@ class Leashing_Cog(commands.Cog):
 		for leasher in self.leash_mapping.keys():
 			if member.id in self.leash_mapping[leasher]:
 				self.leash_mapping[leasher].remove(member.id)
+
+		# Save file
+		with open(leash_pickle_file, 'wb') as pickle_outfile:
+			pickle.dump(self.leash_mapping, pickle_outfile)
+
 
 		# Clear all user-specific channel restrictions
 		for channel in member.guild.channels:

@@ -55,7 +55,7 @@ class Config_Commands_Cog(commands.Cog):
 			return
 
 
-		config['numbers'][setting_name] = str(value)
+		config['toggles'][setting_name] = str(value)
 		save_settings()
 		logger.info(f'{context.author.name} updated {setting_name} to {value}')
 		await context.send(f'Updated {setting_name} to {value}', ephemeral=True)

@@ -55,7 +55,7 @@ class Leashing_Cog(commands.Cog):
 				return
 			elif target_member.id in self.leash_mapping[leasher] and context.author.id == leasher:
 				await self.remove_from_leashing(target_member)
-				await context.send('Unleashed user')
+				await context.send(f'Unleashed {target_member.display_name}')
 				return
 
 		if context.author.id in self.leash_mapping.keys():
@@ -89,13 +89,50 @@ class Leashing_Cog(commands.Cog):
 		logger.info('Leashing successful!')
 
 	# Leashing command
-	@commands.hybrid_command(description='Add or remove leashing (toggle).')
-	async def leash_debug(self, context: commands.Context, target_member: discord.Member):
-		# Permissions check
-		if context.author.id not in [1053028780383424563]:
+	@commands.hybrid_command(description='Release all leashes you are currently holding.')
+	async def unleash_all(self, context: commands.Context):
+		# Check for leasher's ID
+		if context.author.id not in self.leash_mapping.keys():
+			await context.send(f'No users to unleash', ephemeral=True)
 			return
 
-		await self.remove_from_leashing(target_member)
+		total_leashees = len(self.leash_mapping[context.author.id])
+		# Make copy to avoid issues of leashing
+		leashee_id_list = self.leash_mapping[context.author.id].copy()
+		# Edit leashee's perms
+		for leashee_id in leashee_id_list:
+			member_obj = context.guild.get_member(leashee_id)
+			# cache miss
+			if member_obj == None:
+				member_obj = await context.guild.fetch_member(leashee_id)
+			await self.remove_from_leashing(member_obj)
+
+		await context.send(f'Removed leash from {total_leashees} user(s)')
+
+
+	# Leashing command
+	@commands.hybrid_command(description='Print users you have leashed.')
+	async def print_leashees(self, context: commands.Context):
+		# Check for leasher's ID
+		if context.author.id not in self.leash_mapping.keys():
+			await context.send(f'No users currently leashed', ephemeral=True)
+			return
+
+		if len(self.leash_mapping[context.author.id]) == 0:
+			await context.send(f'No users currently leashed', ephemeral=True)
+			return
+
+		leashed_users = 'Currently leashed users:\n'
+		# Edit leashee's perms
+		for leashee_id in self.leash_mapping[context.author.id]:
+			member_obj = context.guild.get_member(leashee_id)
+			# cache miss
+			if member_obj == None:
+				member_obj = await context.guild.fetch_member(leashee_id)
+			# Append to list
+			leashed_users += f'- {member_obj.display_name}\n'
+
+		await context.send(leashed_users)
 
 
 	# Run message relay

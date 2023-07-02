@@ -2,6 +2,7 @@ from discord.ext import tasks, commands
 from discord import SyncWebhook
 from discord import app_commands
 import configparser
+import pickle
 import re
 import os
 import discord
@@ -11,10 +12,11 @@ from string import ascii_uppercase
 from random import choices
 from typing import Literal
 #from typing import Optional
+from settings import *
 
 logger = logging.getLogger('bot')
 
-woof_enforced_path = os.path.dirname(__file__)+os.path.sep+'woof_enforced.txt'
+leash_pickle_file = os.path.dirname(__file__)+os.path.sep+'leashing.pickle'
 
 class Leashing_Cog(commands.Cog):
 
@@ -23,13 +25,21 @@ class Leashing_Cog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		logger.info('Loaded leashing')
+		if os.path.exists(leash_pickle_file):
+			with open(leash_pickle_file, 'rb') as pickle_infile:
+				self.leash_mapping = pickle.load(pickle_infile)
 
 	# Leashing command
 	@commands.hybrid_command(description='Add or remove leashing (toggle).')
 	async def leash(self, context: commands.Context, target_member: discord.Member):
+
 		# Permissions check
-		if context.author.id not in [1053028780383424563]:
+		#if context.author.id not in [1053028780383424563]:
+		#	return
+		if config.getint('roles','meanie_role') not in [role.id for role in context.author.roles]:
 			return
+
+
 		logger.info(f'{context.author.name} attempts to leash {target_member.name}')
 
 		for leasher in self.leash_mapping.keys():
@@ -46,6 +56,10 @@ class Leashing_Cog(commands.Cog):
 		else:
 			self.leash_mapping[context.author.id] = [target_member.id]
 		await context.send(f'Successfully leashed {target_member.display_name}.')
+
+		# Save file
+		with open(leash_pickle_file, 'wb') as pickle_outfile:
+			pickle.dump(self.leash_mapping, pickle_outfile)
 
 		# Permission overwrite that deny viewing a channel
 		no_perms = discord.PermissionOverwrite()

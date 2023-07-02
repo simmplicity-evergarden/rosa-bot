@@ -17,7 +17,7 @@ from settings import *
 
 logger = logging.getLogger('bot')
 
-class WoofEnforcer_Cog(commands.Cog):
+class Feral_Filter_Cog(commands.Cog):
 	message_saving_dict = {}
 
 	def __init__(self, bot):
@@ -86,7 +86,7 @@ class WoofEnforcer_Cog(commands.Cog):
 		elif message_content.endswith('!'):
 			message_content = "***bark!***"
 		else:
-			message_content = re.sub(r"(?<![<:@])\b[\w']*\w*",self.woof_length,message_content)
+			message_content = re.sub(r"(?:(?<![<:@])\b[\w']*\w*|(?:<a?)?:\w+:(?:\d{18,19}>)?)",self.woof_length,message_content)
 		return message_content
 
 	def woof_length(self, word):
@@ -178,6 +178,7 @@ class WoofEnforcer_Cog(commands.Cog):
 					# skip ferals
 					elif feral_role in reaction_user.roles:
 						#print('feral')
+						user_count += config.getint('numbers','feral_vote_value')
 						continue
 					else:
 						user_count += 1
@@ -207,14 +208,25 @@ class WoofEnforcer_Cog(commands.Cog):
 				#print(f'User count is now {user_count}')
 
 
+		# double-check this
+		if reaction.message.id not in self.message_saving_dict.keys():
+			return
 
 		# restore message
-		if user_count > config.getint('numbers','feral_vote_requirement'):
+		if user_count >= config.getint('numbers','feral_vote_requirement'):
 			if config.getint('runtime','webhook_channel') != reaction.message.channel.id:
 				await self.webhook.edit(channel=reaction.message.channel)
 				config['runtime']['webhook_channel'] = str(reaction.message.channel.id)
 			original_content = self.message_saving_dict[reaction.message.id]
+
+			# Huff chance
+			dice_roll = randint(0,100)
+			if dice_roll < config.getint('numbers','paw_huff_chance'):
+				original_content = "***HUFF HUFF HUFF HUFF*** **AWOOO~**"
+
 			await self.webhook.edit_message(reaction.message.id, content=original_content)
+			self.message_saving_dict.pop(reaction.message.id)
+
 
 
 	

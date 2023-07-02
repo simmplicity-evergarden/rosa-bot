@@ -19,3 +19,8 @@
 	- corruption increases with each message
 	- random robot noises: "beep" "boop" etc
 	- first person pronouns replaced w/ 
+- image filter
+	- image is replaced with a certain image
+	- image is replaced with one that is heavily dithered, or turned to ascii
+- mechanics that can fix corrupted bots
+	- react w/ wench emoji?

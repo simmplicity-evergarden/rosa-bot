@@ -4,7 +4,6 @@ import re
 import os
 import discord
 import logging
-from string import ascii_uppercase
 #from random import randint
 from random import choices
 from random import randint
@@ -15,12 +14,12 @@ import configparser
 
 logger = logging.getLogger('bot')
 
-class Squeak_Miho_Cog(commands.Cog):
+class Inflatables_Filter_Cog(commands.Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
 		# Load config
-		logger.info('Loaded Squeak Miho')
+		logger.info('Loaded Inflatables Filter')
 
 	async def cog_load(self):
 		target_guild = self.bot.get_guild(config.getint('guild','guild_id'))
@@ -35,15 +34,12 @@ class Squeak_Miho_Cog(commands.Cog):
 	# Run message relay
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if not config.getboolean('toggles','miho_squeaks'):
-			return
-
 		# webhook check
 		if type(message.author) == discord.User:
 			return
 
-		# Miho ID check
-		if message.author.id != 232281893696045056:
+		# TODO: Add "inflatables" role to settings.ini
+		if config.getint('roles','inflatables_role') not in [role.id for role in context.author.roles]:
 			return
 
 		message_content = message.content
@@ -54,11 +50,11 @@ class Squeak_Miho_Cog(commands.Cog):
 			if sticker.name == 'Rosaflatable':
 				return
 
-		dice_roll = randint(0,99)
+		dice_roll = randint(0,100)
 		print(dice_roll)
 
-		# ~10% chance to activate
-		if dice_roll < config.getint('numbers','miho_squeak_chance'):
+		# TODO: add setting to settings.ini
+		if dice_roll < config.getint('numbers','inflatable_squeak_chance'):
 			# Replace message
 			await message.delete()
 
@@ -109,10 +105,12 @@ class Squeak_Miho_Cog(commands.Cog):
 	async def on_reaction_add(self, reaction, member):
 		if isinstance(reaction.emoji, str):
 			return 
-		# Miho ID check
+
+		# TODO: replace w/ role check
 		if member.id != 232281893696045056:
 			return
 
+		# TODO: replace w/ role removal
 		if reaction.emoji.name == 'safeword':
 			config['toggles']['miho_squeaks'] = 'False'
 			save_settings()

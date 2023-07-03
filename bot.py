@@ -17,9 +17,11 @@ import cogs.smile_enforcer
 import cogs.renamer
 import cogs.speak_as_bot
 import cogs.squeak_miho
+import cogs.squeak_lei
+import cogs.squeak_role
 import cogs.leashing
 import cogs.feral_filter
-#import cogs.webhook_manager
+import cogs.mantras
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -38,7 +40,8 @@ async def on_ready():
 	await bot.add_cog(cogs.renamer.Renamer_Cog(bot))
 	await bot.add_cog(cogs.speak_as_bot.Speak_as_Bot_Cog(bot))
 	await bot.add_cog(cogs.squeak_miho.Squeak_Miho_Cog(bot))
+	await bot.add_cog(cogs.squeak_lei.Squeak_Lei_Cog(bot))
+	await bot.add_cog(cogs.squeak_role.Squeak_Role_Cog(bot))
 	await bot.add_cog(cogs.leashing.Leashing_Cog(bot))
 	await bot.add_cog(cogs.feral_filter.Feral_Filter_Cog(bot))
-	# Webhook comes last
-#	await bot.add_cog(cogs.webhook_manager.Webhook_Manager_Cog(bot))
+	await bot.add_cog(cogs.mantras.Mantras_Cog(bot))

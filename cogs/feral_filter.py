@@ -98,12 +98,16 @@ class Feral_Filter_Cog(commands.Cog):
 					return 'gr'
 				case 1:
 					return 'arf'
+				case 2:
+					return 'ru'
 		elif len(word.group()) < 5:
 			match randint(0,1):
 				case 0:
 					return 'ruff'
 				case 1:
 					return 'woof'
+				case 2:
+					return 'bark'
 		else:
 			match randint(0,7):
 				case 0:
@@ -120,7 +124,7 @@ class Feral_Filter_Cog(commands.Cog):
 					return 'aww'+str('o'*(len(word.group())-1))
 				case 6:
 					return '*growl*'
-				case 6:
+				case 7:
 					return '*pants*'
 
 

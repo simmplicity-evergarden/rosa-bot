@@ -12,8 +12,8 @@ from settings import *
 
 logger = logging.getLogger('bot')
 
-valid_toggles = Literal['miho_squeaks']
-valid_numbers = Literal['miho_squeak_chance','feral_vote_requirement','feral_vote_value','paw_huff_chance']
+valid_toggles = Literal['miho_squeaks','lei_squeaks']
+valid_numbers = Literal['miho_squeak_chance','lei_squeak_chance','role_squeak_chance','feral_vote_requirement','feral_vote_value','paw_huff_chance']
 
 class Config_Commands_Cog(commands.Cog):
 
@@ -34,6 +34,10 @@ class Config_Commands_Cog(commands.Cog):
 		if context.author.id == 232281893696045056 and setting_name == 'miho_squeak_chance':
 			await context.send(f'Miho, you can\'t change your own squeak chance! Adding +1 chance as a punishment.')
 			return
+		# Prevent Lei from changing their settings
+		if context.author.id == 108904078351814656 and setting_name == 'lei_squeak_chance':
+			await context.send(f'Lei, you can\'t change your own squeak chance! Adding +1 chance as a punishment.')
+			return
 
 
 		config['numbers'][setting_name] = str(value)
@@ -52,6 +56,10 @@ class Config_Commands_Cog(commands.Cog):
 		# Prevent Miho from changing their settings
 		if context.author.id == 232281893696045056 and setting_name == 'miho_squeaks':
 			await context.send(f'Miho, you can\'t change your own squeak chance! Adding +1% chance as a punishment.')
+			return
+		# Prevent Lei from changing their settings
+		if context.author.id == 108904078351814656 and setting_name == 'lei_squeaks':
+			await context.send(f'Lei, you can\'t change your own squeak chance! Adding +1 chance as a punishment.')
 			return
 
 

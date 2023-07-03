@@ -149,6 +149,9 @@ class Leashing_Cog(commands.Cog):
 		# Check for mismatched channel
 		elif message.channel.id != self.channel_mapping[message.author.id]:
 			self.channel_mapping[message.author.id] = message.channel.id
+		# No leashees
+		elif  len(self.leash_mapping[message.author.id]) == 0:
+			return
 		# Avoid updating perms if channel matches last channel
 		else:
 			return

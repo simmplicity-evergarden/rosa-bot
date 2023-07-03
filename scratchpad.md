@@ -24,3 +24,7 @@
 	- image is replaced with one that is heavily dithered, or turned to ascii
 - mechanics that can fix corrupted bots
 	- react w/ wench emoji?
+- ferals
+	- react with paws/:feet: to increase chance of huffing
+	- admins now get normal +1 unlock, unless key is used
+

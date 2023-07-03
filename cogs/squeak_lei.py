@@ -11,16 +11,15 @@ from random import randint
 from typing import Literal
 from settings import *
 #from typing import Optional
-import configparser
 
 logger = logging.getLogger('bot')
 
-class Smile_Enforcer_Cog(commands.Cog):
+class Squeak_Lei_Cog(commands.Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
 		# Load config
-		logger.info('Loaded Smile Enforcer')
+		logger.info('Loaded Squeak Lei')
 
 	async def cog_load(self):
 		target_guild = self.bot.get_guild(config.getint('guild','guild_id'))
@@ -30,34 +29,36 @@ class Smile_Enforcer_Cog(commands.Cog):
 				# Track this separately since it seems to get lost
 				config['runtime']['webhook_channel'] = str(webhook.channel_id)
 
+
+
 	# Run message relay
 	@commands.Cog.listener()
 	async def on_message(self, message):
-
-		# Webhook check
-		if isinstance(message.author, discord.User):
+		if not config.getboolean('toggles','lei_squeaks'):
 			return
 
-		# Toy role check
-		toy_role = message.guild.get_role(config.getint('roles','toy_role'))
-		if toy_role not in message.author.roles:
+		# webhook check
+		if type(message.author) == discord.User:
+			return
+
+		# Lei ID check
+		if message.author.id != 108904078351814656:
 			return
 
 		message_content = message.content
+		logger.debug(f'{message.author.display_name}: {message_content}')
 
 		# Allow Rosa sticker
 		for sticker in message.stickers:
 			if sticker.name == 'Rosaflatable':
 				return
 
+		dice_roll = randint(0,99)
+		#logger.debug(dice_roll)
 
-		if re.search(r"\*\*Smile(?:s)?!~\*\*",message_content) == None:
-			logger.debug(f'{message.author.display_name}: {message_content}')
-
-			# Tease on error, 5% chance
-			display_tease = randint(0,9)
-			if display_tease == 1:
-				await message.reply("Someone forgot to **Smile!~**")
+		# ~10% chance to activate
+		if dice_roll < config.getint('numbers','lei_squeak_chance'):
+			# Replace message
 			await message.delete()
 
 			# Squeak modififer
@@ -70,32 +71,6 @@ class Smile_Enforcer_Cog(commands.Cog):
 			wm_avatar_url = message.author.display_avatar.url
 			await self.webhook.send(wm_contents, username=wm_author, avatar_url=wm_avatar_url, silent=True)
 
-
-	# Run message relay
-	@commands.Cog.listener()
-	async def on_message_edit(self, message_old, message):
-
-		# Webhook check
-		if isinstance(message.author, discord.User):
-			return
-
-		# Toy role check
-		toy_role = message.guild.get_role(config.getint('roles','toy_role'))
-		if toy_role not in message.author.roles:
-			return
-
-
-		message_content = message.content
-		print(message_content)
-
-		# Allow Rosa sticker
-		for sticker in message.stickers:
-			if sticker.name == 'Rosaflatable':
-				return
-
-		if re.search(r"\*\*Smile(?:s)?!~\*\*",message_content) == None:
-			await message.delete()
-			#await message.reply("Don't forget to **Smile!~**")
 
 	# Modify messages
 	def squeak_modifier(self, message_content: str):
@@ -110,7 +85,7 @@ class Smile_Enforcer_Cog(commands.Cog):
 		elif len(word.group()) < 5:
 			return 'SQUEAK'
 		else:
-			match randint(0,5):
+			match randint(0,6):
 				case 0:
 					return 's'+str('q'*(len(word.group())-1))+'rk'
 				case 1:
@@ -124,4 +99,19 @@ class Smile_Enforcer_Cog(commands.Cog):
 				case 5:
 					return 'cr'+str('e'*(len(word.group())-1))+'ak'
 				case 6:
-					return 'Smile!'
+					return '**Smile!**'
+				case 7:
+					return 'Rosa'
+
+	# Lei safeword
+	@commands.Cog.listener()
+	async def on_reaction_add(self, reaction, member):
+		if isinstance(reaction.emoji, str):
+			return 
+		# Lei ID check
+		if member.id != 108904078351814656:
+			return
+
+		if reaction.emoji.name == 'safeword':
+			config['toggles']['lei_squeaks'] = 'False'
+			save_settings()

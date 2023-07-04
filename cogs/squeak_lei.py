@@ -113,5 +113,6 @@ class Squeak_Lei_Cog(commands.Cog):
 			return
 
 		if reaction.emoji.name == 'safeword':
-			config['toggles']['lei_squeaks'] = 'False'
-			save_settings()
+#			config['toggles']['lei_squeaks'] = 'False'
+#			save_settings()
+			pass

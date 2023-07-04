@@ -13,7 +13,10 @@ from settings import *
 logger = logging.getLogger('bot')
 
 valid_toggles = Literal['miho_squeaks','lei_squeaks']
-valid_numbers = Literal['miho_squeak_chance','lei_squeak_chance','role_squeak_chance','feral_vote_requirement','feral_vote_value','paw_huff_chance']
+valid_numbers = Literal['miho_squeak_chance','lei_squeak_chance','role_squeak_chance',\
+'feral_vote_requirement','feral_vote_value','paw_huff_base_chance','paw_huff_vote_value',\
+'simm_huff_base_chance','simm_vote_requirement',\
+'thrall_duration']
 
 class Config_Commands_Cog(commands.Cog):
 
@@ -83,6 +86,16 @@ class Config_Commands_Cog(commands.Cog):
 		# Print number-settings
 		response += "Numbers:\n"
 		for key in config['numbers'].keys():
+			# Prevent Miho from changing their settings
+			if context.author.id == 232281893696045056 and key == 'miho_squeak_chance':
+				response += f'> **{key}:** <:rosasmug:1049703628639834163>\n'
+				continue
+
+			# Prevent Lei from changing their settings
+			if context.author.id == 108904078351814656 and key == 'lei_squeak_chance':
+				response += f'> **{key}:** <:rosasmug:1049703628639834163>\n'
+				continue
+
 			response += f'> **{key}:** {config["numbers"][key]}\n'
 
 		await context.send(response, ephemeral=True)

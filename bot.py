@@ -35,6 +35,7 @@ async def on_ready():
 	logger.info('---------------------------------------------')
 	await bot.add_cog(cogs.common.Common_Cog(bot))
 	await bot.add_cog(cogs.config_commands.Config_Commands_Cog(bot))
+	await bot.add_cog(cogs.mantras.Mantras_Cog(bot))
 	await bot.add_cog(cogs.roles_manager.Roles_Manager_Cog(bot))
 	await bot.add_cog(cogs.smile_enforcer.Smile_Enforcer_Cog(bot))
 	await bot.add_cog(cogs.renamer.Renamer_Cog(bot))
@@ -44,4 +45,3 @@ async def on_ready():
 	await bot.add_cog(cogs.squeak_role.Squeak_Role_Cog(bot))
 	await bot.add_cog(cogs.leashing.Leashing_Cog(bot))
 	await bot.add_cog(cogs.feral_filter.Feral_Filter_Cog(bot))
-	await bot.add_cog(cogs.mantras.Mantras_Cog(bot))

@@ -114,5 +114,6 @@ class Squeak_Miho_Cog(commands.Cog):
 			return
 
 		if reaction.emoji.name == 'safeword':
-			config['toggles']['miho_squeaks'] = 'False'
-			save_settings()
+#			config['toggles']['miho_squeaks'] = 'False'
+#			save_settings()
+			pass

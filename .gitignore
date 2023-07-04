@@ -1,5 +1,7 @@
 # Authentication file
 authentication.ini
+# Ignore pickle files
+*.pickle
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
